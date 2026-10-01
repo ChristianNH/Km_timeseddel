@@ -19,18 +19,22 @@
   --bg:#f6f5f2; --card:#ffffff; --ink:#17191c; --muted:#6b6f76; --line:#e2e1dc;
   --red:#d7231f; --red-ink:#ffffff; --soft:#fbeceb; --ok:#1f7a3d; --warn:#9a6700;
   --field:#ffffff; --chip:#f0efeb; --shadow:0 1px 2px rgba(0,0,0,.06);
+  color-scheme:light;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#15161a; --card:#1e2026; --ink:#f2f2f0; --muted:#9a9ea7; --line:#2e3139;
     --red:#ef4a45; --soft:#3a1f1f; --field:#24262d; --chip:#2a2d35; --ok:#5ec47e; --warn:#e3b341; --shadow:none;
+    color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --bg:#15161a; --card:#1e2026; --ink:#f2f2f0; --muted:#9a9ea7; --line:#2e3139;
   --red:#ef4a45; --soft:#3a1f1f; --field:#24262d; --chip:#2a2d35; --ok:#5ec47e; --warn:#e3b341; --shadow:none;
+  color-scheme:dark;
 }
 *{box-sizing:inherit;margin:0}
+[hidden]{display:none !important}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font:16px/1.45 "Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
@@ -48,9 +52,11 @@ header h1 small{display:block;font-size:13px;font-weight:500;color:var(--muted);
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
 .setup{padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:5px}
-input,select,textarea{width:100%;font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:10px;padding:11px 12px;min-height:46px;-webkit-appearance:none;appearance:none}
+input,select,textarea{width:100%;font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px;-webkit-appearance:none;appearance:none}
+input[type=time],input[type=date]{cursor:pointer}
+input::-webkit-calendar-picker-indicator{opacity:.7;cursor:pointer}
 input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--red);outline-offset:1px;border-color:transparent}
-select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 18px) 20px,calc(100% - 13px) 20px;background-size:5px 5px;background-repeat:no-repeat;padding-right:36px}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 18px) 19px,calc(100% - 13px) 19px;background-size:5px 5px;background-repeat:no-repeat;padding-right:36px}
 
 .totals{display:grid;grid-template-columns:repeat(3,1fr);margin-bottom:14px;overflow:hidden}
 .totals div{padding:12px 10px;border-right:1px solid var(--line)}
@@ -83,19 +89,19 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
 
 .sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center;z-index:10}
 .sheet.open{display:flex}
-.panel{background:var(--card);width:100%;max-width:560px;max-height:92%;overflow:auto;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px))}
-.panel h2{font-size:18px;margin-bottom:12px}
+.panel{background:var(--card);width:100%;max-width:560px;max-height:96%;overflow:auto;border-radius:18px 18px 0 0;padding:14px 16px calc(12px + env(safe-area-inset-bottom,0px))}
+.panel h2{font-size:18px;margin-bottom:10px}
 .panel h3{font-size:13px;font-weight:600;color:var(--muted);margin:16px 0 8px}
 .panel p{font-size:14px;color:var(--muted);margin-bottom:10px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}
+.grid label{margin-bottom:0}
+.grid label span{display:block;margin-bottom:4px}
 .grid .full{grid-column:1/-1}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.chip{font:inherit;font-size:14px;font-weight:500;background:var(--chip);border:1px solid transparent;border-radius:999px;padding:8px 13px;color:var(--ink);cursor:pointer;min-height:38px}
-.chip.on{background:var(--red);color:var(--red-ink)}
-.calc{display:flex;justify-content:space-between;align-items:baseline;padding:10px 12px;background:var(--soft);border-radius:10px;margin:4px 0 12px;font-size:14px}
+.calc{display:flex;justify-content:space-between;align-items:baseline;padding:8px 12px;background:var(--soft);border-radius:10px;margin:10px 0 6px;font-size:14px}
 .calc b{font-size:20px;font-variant-numeric:tabular-nums}
 .actions{display:flex;gap:10px;margin-top:6px}
-.err{color:var(--red);font-size:14px;margin-bottom:8px;min-height:1em}
+.err{color:var(--red);font-size:14px;margin-bottom:4px;min-height:0}
+.err:empty{display:none}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(88px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20;max-width:90%}
 .toast.show{opacity:1}
 .arch{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--line);font-size:14px;gap:10px}
@@ -137,21 +143,17 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
   <form class="panel" id="form" autocomplete="off">
     <h2 id="formTitle">New shift</h2>
     <div class="grid">
-      <label class="full">Date<input type="date" id="fDate" required></label>
-      <label>Start<input type="time" id="fStart" step="300" required></label>
-      <label>End<input type="time" id="fEnd" step="300" required></label>
-      <label>Break<select id="fPause">
+      <label><span>Date</span><input type="date" id="fDate" required></label>
+      <label><span>Type</span><select id="fType"><option value="Normal">Normal</option><option value="Ekstra">Extra</option></select></label>
+      <label><span>Start</span><input type="time" id="fStart" step="300" required></label>
+      <label><span>End</span><input type="time" id="fEnd" step="300" required></label>
+      <label><span>Break</span><select id="fPause">
         <option value="0">0:00</option><option value="15">0:15</option><option value="30">0:30</option>
         <option value="45">0:45</option><option value="60">1:00</option><option value="90">1:30</option>
       </select></label>
-      <label>Type<select id="fType"><option value="Normal">Normal</option><option value="Ekstra">Extra</option></select></label>
-      <div class="full">
-        <label for="fSite">Workplace</label>
-        <input id="fSite" list="sites" placeholder="Pick below or type your own" required>
-        <datalist id="sites"></datalist>
-        <div class="chips" id="chips"></div>
-      </div>
-      <label class="full">Notes<input id="fNote" placeholder="Optional"></label>
+      <label><span>Workplace</span><select id="fSiteSel"></select></label>
+      <label class="full" id="fSiteOtherWrap" hidden><span>Workplace name</span><input id="fSite" placeholder="Type the workplace" autocomplete="off"></label>
+      <label class="full"><span>Notes</span><input id="fNote" placeholder="Optional"></label>
     </div>
     <div class="calc"><span>Hours</span><b id="fHours">0.00</b></div>
     <div class="err" id="fErr"></div>
@@ -330,9 +332,6 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
         card.appendChild(btn);
       }
     }
-    const dl=$('sites');dl.innerHTML='';
-    const used=state.entries.map(e=>e.site).concat(state.archive.flatMap(a=>a.entries.map(e=>e.site)));
-    [...new Set(PRESETS.concat(used.filter(Boolean)))].sort((a,b)=>a.localeCompare(b,'da')).forEach(s=>{const o=document.createElement('option');o.value=s;dl.appendChild(o);});
     renderArchive();setStatus();
   }
   function renderArchive(){
@@ -357,11 +356,25 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
 
   // ---------- shift form ----------
   let editing=null;const sheet=$('sheet');
-  const chips=$('chips');
-  PRESETS.forEach(p=>{const c=document.createElement('button');c.type='button';c.className='chip';c.textContent=p;c.addEventListener('click',()=>{$('fSite').value=p;markChips();});chips.appendChild(c);});
-  function markChips(){const v=$('fSite').value.trim().toLowerCase();chips.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.textContent.toLowerCase()===v));}
-  $('fSite').addEventListener('input',markChips);
-  function formEntry(){return {date:$('fDate').value,start:$('fStart').value,end:$('fEnd').value,pause:Number($('fPause').value),type:$('fType').value,site:$('fSite').value.trim(),note:$('fNote').value.trim()};}
+  const OTHER='__other__';
+  function siteOptions(){const used=state.entries.map(e=>e.site).concat(state.archive.flatMap(a=>a.entries.map(e=>e.site))).filter(Boolean);
+    const extra=[...new Set(used)].filter(s=>!PRESETS.some(p=>p.toLowerCase()===s.toLowerCase())).sort((a,b)=>a.localeCompare(b));return PRESETS.concat(extra);}
+  function fillSiteSelect(current){
+    const sel=$('fSiteSel');sel.innerHTML='';
+    const ph=document.createElement('option');ph.value='';ph.textContent='Select…';ph.disabled=true;sel.appendChild(ph);
+    const opts=siteOptions();
+    opts.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;sel.appendChild(o);});
+    const other=document.createElement('option');other.value=OTHER;other.textContent='Other… (type it in)';sel.appendChild(other);
+    if(current&&opts.includes(current)){sel.value=current;showOther(false);}
+    else if(current){sel.value=OTHER;showOther(true);$('fSite').value=current;}
+    else{sel.value='';showOther(false);}
+  }
+  function showOther(on){$('fSiteOtherWrap').hidden=!on;if(!on)$('fSite').value='';}
+  $('fSiteSel').addEventListener('change',()=>{const o=$('fSiteSel').value===OTHER;showOther(o);if(o)$('fSite').focus();});
+  function siteValue(){const v=$('fSiteSel').value;return v===OTHER?$('fSite').value.trim():v;}
+  // tap anywhere in a time/date field to open the native picker
+  ['fDate','fStart','fEnd'].forEach(id=>{const el=$(id);el.addEventListener('click',()=>{try{el.showPicker&&el.showPicker();}catch(e){}});});
+  function formEntry(){return {date:$('fDate').value,start:$('fStart').value,end:$('fEnd').value,pause:Number($('fPause').value),type:$('fType').value,site:siteValue(),note:$('fNote').value.trim()};}
   function updCalc(){$('fHours').textContent=fmt(hoursOf(formEntry()));}
   ['fStart','fEnd','fPause'].forEach(id=>$(id).addEventListener('input',updCalc));
   function openForm(id){
@@ -374,8 +387,8 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
     $('fEnd').value=e?e.end:'';
     $('fPause').value=e?String(e.pause):'0';
     $('fType').value=e?e.type:'Normal';
-    $('fSite').value=e?e.site:'';$('fNote').value=e?e.note:'';
-    markChips();updCalc();sheet.classList.add('open');setTimeout(()=>(e?$('fSite'):$('fEnd')).focus(),50);
+    fillSiteSelect(e?e.site:'');$('fNote').value=e?e.note:'';
+    updCalc();sheet.classList.add('open');
   }
   function closeForm(){sheet.classList.remove('open');editing=null;}
   $('addBtn').addEventListener('click',()=>openForm());
@@ -383,7 +396,7 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
   sheet.addEventListener('click',e=>{if(e.target===sheet)closeForm();});
   $('form').addEventListener('submit',ev=>{
     ev.preventDefault();const e=formEntry();
-    if(!e.date||!e.start||!e.end||!e.site){$('fErr').textContent='Fill in date, start, end and workplace.';return;}
+    if(!e.date||!e.start||!e.end||!e.site){$('fErr').textContent='Fill in date, start, end and workplace.';$('fErr').scrollIntoView({block:'nearest'});return;}
     if(hoursOf(e)<=0){$('fErr').textContent='End time must be after start time (minus break).';return;}
     e.u=now();
     const wasEdit=!!editing;
