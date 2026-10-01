@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="da">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Timeseddel – K.M Ejendomsservice</title>
+<title>Timesheet – K.M Ejendomsservice</title>
 <meta name="theme-color" content="#d7231f">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Timeseddel">
+<meta name="apple-mobile-web-app-title" content="Timesheet">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%23d7231f%27/%3E%3Ctext x=%2732%27 y=%2744%27 font-size=%2734%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27Arial%27 font-weight=%27bold%27%3EKM%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -107,58 +107,58 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
 <body>
 <div class="wrap">
   <header>
-    <h1>Timeseddel<small>K.M Ejendomsservice</small></h1>
-    <button class="iconbtn" id="moreBtn">Mere</button>
+    <h1>Timesheet<small>K.M Ejendomsservice</small></h1>
+    <button class="iconbtn" id="moreBtn">More</button>
   </header>
   <div class="rule"></div>
-  <div class="status" id="status"><span class="dot"></span><span id="statusText">Gemmer på denne telefon…</span></div>
+  <div class="status" id="status"><span class="dot"></span><span id="statusText">Saving on this phone…</span></div>
 
   <section class="card setup">
-    <label>Navn<input id="name" autocomplete="name" placeholder="Fornavn Efternavn"></label>
-    <label>Måned<input id="month" type="month"></label>
+    <label>Name<input id="name" autocomplete="name" placeholder="First Last"></label>
+    <label>Month<input id="month" type="month"></label>
   </section>
 
   <section class="card totals">
-    <div><span>Total timer</span><b id="tNormal">0,00</b></div>
-    <div><span>Ekstra timer</span><b id="tExtra">0,00</b></div>
-    <div class="sum"><span>Sum</span><b id="tSum">0,00</b></div>
+    <div><span>Total hours</span><b id="tNormal">0.00</b></div>
+    <div><span>Extra hours</span><b id="tExtra">0.00</b></div>
+    <div class="sum"><span>Sum</span><b id="tSum">0.00</b></div>
   </section>
 
   <section class="list" id="list"></section>
 </div>
 
 <div class="bar"><div>
-  <button class="btn primary" id="addBtn">+ Ny vagt</button>
-  <button class="btn" id="exportBtn">Hent Excel</button>
+  <button class="btn primary" id="addBtn">+ New shift</button>
+  <button class="btn" id="exportBtn">Download Excel</button>
 </div></div>
 
 <!-- shift form -->
 <div class="sheet" id="sheet">
   <form class="panel" id="form" autocomplete="off">
-    <h2 id="formTitle">Ny vagt</h2>
+    <h2 id="formTitle">New shift</h2>
     <div class="grid">
-      <label class="full">Dato<input type="date" id="fDate" required></label>
+      <label class="full">Date<input type="date" id="fDate" required></label>
       <label>Start<input type="time" id="fStart" step="300" required></label>
-      <label>Slut<input type="time" id="fEnd" step="300" required></label>
-      <label>Pause<select id="fPause">
+      <label>End<input type="time" id="fEnd" step="300" required></label>
+      <label>Break<select id="fPause">
         <option value="0">0:00</option><option value="15">0:15</option><option value="30">0:30</option>
         <option value="45">0:45</option><option value="60">1:00</option><option value="90">1:30</option>
       </select></label>
-      <label>Type<select id="fType"><option>Normal</option><option>Ekstra</option></select></label>
+      <label>Type<select id="fType"><option value="Normal">Normal</option><option value="Ekstra">Extra</option></select></label>
       <div class="full">
-        <label for="fSite">Arbejdssted</label>
-        <input id="fSite" list="sites" placeholder="Vælg nedenfor eller skriv selv" required>
+        <label for="fSite">Workplace</label>
+        <input id="fSite" list="sites" placeholder="Pick below or type your own" required>
         <datalist id="sites"></datalist>
         <div class="chips" id="chips"></div>
       </div>
-      <label class="full">Bemærkninger<input id="fNote" placeholder="Valgfrit"></label>
+      <label class="full">Notes<input id="fNote" placeholder="Optional"></label>
     </div>
-    <div class="calc"><span>Timer</span><b id="fHours">0,00</b></div>
+    <div class="calc"><span>Hours</span><b id="fHours">0.00</b></div>
     <div class="err" id="fErr"></div>
     <div class="actions">
-      <button type="button" class="btn danger ghost" id="deleteBtn" hidden>Slet</button>
-      <button type="button" class="btn" id="cancelBtn">Annullér</button>
-      <button type="submit" class="btn primary" id="saveBtn">Gem</button>
+      <button type="button" class="btn danger ghost" id="deleteBtn" hidden>Delete</button>
+      <button type="button" class="btn" id="cancelBtn">Cancel</button>
+      <button type="submit" class="btn primary" id="saveBtn">Save</button>
     </div>
   </form>
 </div>
@@ -166,20 +166,20 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
 <!-- more / backup sheet -->
 <div class="sheet" id="moreSheet">
   <div class="panel">
-    <h2>Sikkerhed og arkiv</h2>
+    <h2>Backup and archive</h2>
     <p id="moreStatus"></p>
-    <h3>Dit personlige link</h3>
-    <p>Linket indeholder din hemmelige nøgle. Åbn det samme link på en ny telefon, og alle vagter er der. Del det ikke med andre end dem, der skal se timesedlen.</p>
-    <button class="btn block" id="copyLinkBtn">Kopiér link <small>til ny telefon / backup</small></button>
-    <h3>Sikkerhedskopi</h3>
-    <button class="btn block" id="backupBtn">Hent sikkerhedskopi <small>.json-fil</small></button>
-    <button class="btn block" id="restoreBtn">Gendan fra sikkerhedskopi <small>flettes ind</small></button>
+    <h3>Your personal link</h3>
+    <p>The link contains your secret key. Open the same link on a new phone and all your shifts are there. Only share it with people who should see the timesheet.</p>
+    <button class="btn block" id="copyLinkBtn">Copy link <small>for a new phone / backup</small></button>
+    <h3>Backup file</h3>
+    <button class="btn block" id="backupBtn">Download backup <small>.json file</small></button>
+    <button class="btn block" id="restoreBtn">Restore from backup <small>merged in</small></button>
     <input type="file" id="restoreFile" accept=".json,application/json" hidden>
-    <h3>Afregningsperiode</h3>
-    <p>Når timesedlen er sendt, kan du lukke perioden. Vagterne slettes ikke – de flyttes til arkivet og kan hentes som Excel igen.</p>
-    <button class="btn block" id="closePeriodBtn">Luk perioden og start forfra <small id="closeCount"></small></button>
+    <h3>Pay period</h3>
+    <p>Once the timesheet has been sent, you can close the period. Shifts are not deleted – they move to the archive and can be downloaded as Excel again.</p>
+    <button class="btn block" id="closePeriodBtn">Close period and start fresh <small id="closeCount"></small></button>
     <div id="archiveList"></div>
-    <div class="actions"><button type="button" class="btn" id="moreClose">Luk</button></div>
+    <div class="actions"><button type="button" class="btn" id="moreClose">Close</button></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -189,8 +189,8 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
   const KEY='timeseddel:v2', LEGACY='timeseddel:v1', SHADOW='timeseddel:v2:shadow';
   const PRESETS=['Plantagevej','Lilliendalsvej 1-11','Norsvej 1','Boas Nørrebro','Boas Frederiksberg','Søndervigvej 115','Frederiksberg Allé'];
   const $=id=>document.getElementById(id);
-  const months=['januar','februar','marts','april','maj','juni','juli','august','september','oktober','november','december'];
-  const fmt=n=>n.toFixed(2).replace('.',',');
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const fmt=n=>n.toFixed(2);
   const pad=n=>String(n).padStart(2,'0');
   const now=()=>Date.now();
 
@@ -255,18 +255,18 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
     const t=await r.text();return t?JSON.parse(t):null;
   }
   function describeErr(e){
-    if(!navigator.onLine)return 'ingen internetforbindelse';
-    if(e&&(e.status===540||e.status===503||/paused|unavailable|fetch/i.test(e.message)))return 'databasen svarer ikke – er den sat på pause?';
-    return (e&&e.message)||'ukendt fejl';
+    if(!navigator.onLine)return 'no internet connection';
+    if(e&&(e.status===540||e.status===503||/paused|unavailable|fetch/i.test(e.message)))return 'database not responding – is it paused?';
+    return (e&&e.message)||'unknown error';
   }
   function setStatus(){
     const el=$('status'),t=$('statusText');el.className='status';
-    const time=lastSync?' · '+new Date(lastSync).toLocaleTimeString('da-DK',{hour:'2-digit',minute:'2-digit'}):'';
-    if(cloudState==='synced'){el.classList.add('ok');t.textContent='Gemt på telefonen og i skyen'+time;}
-    else if(cloudState==='saving'){el.classList.add('ok');t.textContent='Gemmer i skyen…';}
-    else if(cloudState==='connecting'){t.textContent='Henter fra skyen…';}
-    else{el.classList.add('bad');t.textContent='Gemt på telefonen · skyen fejlede: '+cloudError+(lastSync?' (sidst synkroniseret'+time+')':'');}
-    $('moreStatus').textContent=t.textContent+'. '+state.entries.length+' vagter i den åbne periode, '+state.archive.length+' arkiverede perioder.';
+    const time=lastSync?' · '+new Date(lastSync).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}):'';
+    if(cloudState==='synced'){el.classList.add('ok');t.textContent='Saved on phone and in the cloud'+time;}
+    else if(cloudState==='saving'){el.classList.add('ok');t.textContent='Saving to cloud…';}
+    else if(cloudState==='connecting'){t.textContent='Loading from cloud…';}
+    else{el.classList.add('bad');t.textContent='Saved on phone · cloud failed: '+cloudError+(lastSync?' (last synced'+time+')':'');}
+    $('moreStatus').textContent=t.textContent+'. '+state.entries.length+' shifts in the open period, '+state.archive.length+' archived periods.';
   }
   async function initCloud(){
     try{
@@ -307,23 +307,23 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
     const t=totalsOf(state.entries);$('tNormal').textContent=fmt(t.n);$('tExtra').textContent=fmt(t.x);$('tSum').textContent=fmt(t.s);
     const list=$('list');list.innerHTML='';
     const es=sorted();
-    if(!es.length){list.innerHTML='<div class="card empty">Ingen vagter i denne periode endnu. Tryk på "Ny vagt" for at komme i gang.</div>';}
+    if(!es.length){list.innerHTML='<div class="card empty">No shifts in this period yet. Tap "New shift" to get started.</div>';}
     else{
-      const h=document.createElement('h2');h.textContent=es.length+(es.length===1?' vagt':' vagter')+' · '+monthLabel(state.month);list.appendChild(h);
+      const h=document.createElement('h2');h.textContent=es.length+(es.length===1?' shift':' shifts')+' · '+monthLabel(state.month);list.appendChild(h);
       let cur=null,card=null,dayTotal=0,dayB=null;
       for(const e of es){
         if(e.date!==cur){
           cur=e.date;dayTotal=0;card=document.createElement('div');card.className='card day';
           const dh=document.createElement('div');dh.className='day-h';
           const dt=new Date(e.date+'T00:00');
-          const label=dt.toLocaleDateString('da-DK',{weekday:'long',day:'numeric',month:'long'});
+          const label=dt.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
           dh.innerHTML='<span></span><b></b>';dh.firstChild.textContent=label.charAt(0).toUpperCase()+label.slice(1);
           dayB=dh.querySelector('b');card.appendChild(dh);list.appendChild(card);
         }
-        const hrs=hoursOf(e);dayTotal+=hrs;dayB.textContent=fmt(dayTotal)+' t';
+        const hrs=hoursOf(e);dayTotal+=hrs;dayB.textContent=fmt(dayTotal)+' h';
         const btn=document.createElement('button');btn.type='button';btn.className='row';
-        const pause=Number(e.pause)?' · pause '+Math.floor(e.pause/60)+':'+pad(e.pause%60):'';
-        btn.innerHTML='<div class="site"></div><div class="hrs">'+fmt(hrs)+'<small>'+(e.type==='Ekstra'?'Ekstra':'Normal')+'</small></div><div class="meta"></div>';
+        const pause=Number(e.pause)?' · break '+Math.floor(e.pause/60)+':'+pad(e.pause%60):'';
+        btn.innerHTML='<div class="site"></div><div class="hrs">'+fmt(hrs)+'<small>'+(e.type==='Ekstra'?'Extra':'Normal')+'</small></div><div class="meta"></div>';
         btn.querySelector('.site').textContent=e.site;
         btn.querySelector('.meta').textContent=e.start+'–'+e.end+pause+(e.note?' · '+e.note:'');
         btn.addEventListener('click',()=>openForm(e.id));
@@ -337,16 +337,16 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
   }
   function renderArchive(){
     const box=$('archiveList');box.innerHTML='';
-    $('closeCount').textContent=state.entries.length+' vagter';
-    if(!state.archive.length){box.innerHTML='<p>Ingen arkiverede perioder endnu.</p>';return;}
-    const h=document.createElement('h3');h.textContent='Arkiv';box.appendChild(h);
+    $('closeCount').textContent=state.entries.length+' shifts';
+    if(!state.archive.length){box.innerHTML='<p>No archived periods yet.</p>';return;}
+    const h=document.createElement('h3');h.textContent='Archive';box.appendChild(h);
     for(const a of state.archive){
       const row=document.createElement('div');row.className='arch';
       const t=totalsOf(a.entries);
       row.innerHTML='<div><b></b><br><span style="color:var(--muted)"></span></div>';
       row.querySelector('b').textContent=a.label;
-      row.querySelector('span').textContent=a.entries.length+' vagter · '+fmt(t.s)+' timer · lukket '+new Date(a.closedAt).toLocaleDateString('da-DK');
-      const b=document.createElement('button');b.className='btn ghost';b.textContent='Hent Excel';b.style.minHeight='40px';b.style.padding='8px 12px';
+      row.querySelector('span').textContent=a.entries.length+' shifts · '+fmt(t.s)+' h · closed '+new Date(a.closedAt).toLocaleDateString('en-GB');
+      const b=document.createElement('button');b.className='btn ghost';b.textContent='Download Excel';b.style.minHeight='40px';b.style.padding='8px 12px';
       b.addEventListener('click',()=>exportXlsx(a.name,a.month,a.entries,b));
       row.appendChild(b);box.appendChild(row);
     }
@@ -358,7 +358,7 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
   // ---------- shift form ----------
   let editing=null;const sheet=$('sheet');
   const chips=$('chips');
-  PRESETS.forEach(p=>{const c=document.createElement('button');c.type='button';c.className='chip';c.textContent=p;c.addEventListener('click',()=>{$('fSite').value=p;markChips();$('fNote').focus();});chips.appendChild(c);});
+  PRESETS.forEach(p=>{const c=document.createElement('button');c.type='button';c.className='chip';c.textContent=p;c.addEventListener('click',()=>{$('fSite').value=p;markChips();});chips.appendChild(c);});
   function markChips(){const v=$('fSite').value.trim().toLowerCase();chips.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.textContent.toLowerCase()===v));}
   $('fSite').addEventListener('input',markChips);
   function formEntry(){return {date:$('fDate').value,start:$('fStart').value,end:$('fEnd').value,pause:Number($('fPause').value),type:$('fType').value,site:$('fSite').value.trim(),note:$('fNote').value.trim()};}
@@ -366,7 +366,7 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
   ['fStart','fEnd','fPause'].forEach(id=>$(id).addEventListener('input',updCalc));
   function openForm(id){
     editing=id||null;const e=id?state.entries.find(x=>x.id===id):null;
-    $('formTitle').textContent=e?'Redigér vagt':'Ny vagt';$('deleteBtn').hidden=!e;$('fErr').textContent='';
+    $('formTitle').textContent=e?'Edit shift':'New shift';$('deleteBtn').hidden=!e;$('fErr').textContent='';
     const last=sorted().pop();
     const today=new Date();const todayIso=today.getFullYear()+'-'+pad(today.getMonth()+1)+'-'+pad(today.getDate());
     $('fDate').value=e?e.date:(last&&last.date>todayIso?last.date:todayIso);
@@ -383,17 +383,17 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
   sheet.addEventListener('click',e=>{if(e.target===sheet)closeForm();});
   $('form').addEventListener('submit',ev=>{
     ev.preventDefault();const e=formEntry();
-    if(!e.date||!e.start||!e.end||!e.site){$('fErr').textContent='Udfyld dato, start, slut og arbejdssted.';return;}
-    if(hoursOf(e)<=0){$('fErr').textContent='Sluttid skal være efter starttid (minus pause).';return;}
+    if(!e.date||!e.start||!e.end||!e.site){$('fErr').textContent='Fill in date, start, end and workplace.';return;}
+    if(hoursOf(e)<=0){$('fErr').textContent='End time must be after start time (minus break).';return;}
     e.u=now();
     const wasEdit=!!editing;
     if(editing){Object.assign(state.entries.find(x=>x.id===editing),e);}
     else{e.id=now().toString(36)+Math.random().toString(36).slice(2,6);state.entries.push(e);}
-    persist();render();closeForm();toast(wasEdit?'Vagt opdateret':'Vagt gemt');
+    persist();render();closeForm();toast(wasEdit?'Shift updated':'Shift saved');
   });
   $('deleteBtn').addEventListener('click',()=>{
-    if(!editing)return;if(!confirm('Slet denne vagt?'))return;
-    state.deleted[editing]=now();state.entries=state.entries.filter(x=>x.id!==editing);persist();render();closeForm();toast('Vagt slettet');
+    if(!editing)return;if(!confirm('Delete this shift?'))return;
+    state.deleted[editing]=now();state.entries=state.entries.filter(x=>x.id!==editing);persist();render();closeForm();toast('Shift deleted');
   });
 
   let toastT;function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600);}
@@ -408,26 +408,26 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
     const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();
     setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},4000);toast(okMsg);
   }
-  $('copyLinkBtn').addEventListener('click',async()=>{const l=shareLink();try{if(navigator.share){await navigator.share({title:'Timeseddel',url:l});}else{await navigator.clipboard.writeText(l);toast('Link kopieret');}}catch(e){prompt('Kopiér dette link:',l);}});
+  $('copyLinkBtn').addEventListener('click',async()=>{const l=shareLink();try{if(navigator.share){await navigator.share({title:'Timesheet',url:l});}else{await navigator.clipboard.writeText(l);toast('Link copied');}}catch(e){prompt('Copy this link:',l);}});
   $('backupBtn').addEventListener('click',()=>{
     const d=new Date();const stamp=d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'-'+pad(d.getHours())+pad(d.getMinutes());
-    saveFile('timeseddel-backup-'+stamp+'.json',JSON.stringify({app:'timeseddel',version:2,exportedAt:now(),state},null,1),'Sikkerhedskopi gemt');
+    saveFile('timeseddel-backup-'+stamp+'.json',JSON.stringify({app:'timeseddel',version:2,exportedAt:now(),state},null,1),'Backup downloaded');
   });
   $('restoreBtn').addEventListener('click',()=>$('restoreFile').click());
   $('restoreFile').addEventListener('change',async ev=>{
     const f=ev.target.files[0];ev.target.value='';if(!f)return;
-    try{const o=JSON.parse(await f.text());const s=o.state||o;if(!Array.isArray(s.entries))throw new Error('ikke en gyldig sikkerhedskopi');
-      const before=state.entries.length;mergeInto(s);persist();render();toast('Gendannet: '+state.entries.length+' vagter ('+(state.entries.length-before>=0?'+':'')+(state.entries.length-before)+')');}
-    catch(e){toast('Kunne ikke læse filen: '+e.message);}
+    try{const o=JSON.parse(await f.text());const s=o.state||o;if(!Array.isArray(s.entries))throw new Error('not a valid backup file');
+      const before=state.entries.length;mergeInto(s);persist();render();toast('Restored: '+state.entries.length+' shifts ('+(state.entries.length-before>=0?'+':'')+(state.entries.length-before)+')');}
+    catch(e){toast('Could not read the file: '+e.message);}
   });
   $('closePeriodBtn').addEventListener('click',()=>{
-    if(!state.entries.length){toast('Der er ingen vagter at arkivere');return;}
+    if(!state.entries.length){toast('There are no shifts to archive');return;}
     const label=monthLabel(state.month);
-    if(!confirm('Luk perioden "'+label+'" med '+state.entries.length+' vagter? De flyttes til arkivet, og du starter med en tom liste.'))return;
-    state.archive.unshift({id:now().toString(36),label:label+' · '+(state.name||'uden navn'),name:state.name,month:state.month,entries:sorted(),closedAt:now()});
+    if(!confirm('Close the period "'+label+'" with '+state.entries.length+' shifts? They move to the archive and you start with an empty list.'))return;
+    state.archive.unshift({id:now().toString(36),label:label+' · '+(state.name||'no name'),name:state.name,month:state.month,entries:sorted(),closedAt:now()});
     state.entries=[];state.deleted={};
     const [y,m]=state.month.split('-').map(Number);const nm=m===12?[y+1,1]:[y,m+1];state.month=nm[0]+'-'+pad(nm[1]);
-    persist();render();moreSheet.classList.remove('open');toast('Perioden er arkiveret – ny periode: '+monthLabel(state.month));
+    persist();render();moreSheet.classList.remove('open');toast('Period archived – new period: '+monthLabel(state.month));
   });
 
   // ---------- Excel export: fills the original KM template (embedded) ----------
@@ -439,7 +439,7 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
     const z=await JSZip.loadAsync(RECIPE_ZIP_B64,{base64:true,checkCRC32:true});
     const json=await z.file('recipe.json').async('string');
     const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(json)))).map(b=>b.toString(16).padStart(2,'0')).join('');
-    if(digest!=='66c52e65776159cccf1dc2e7141e8fa0756c3d40ad98eb16b3fa2ca0abeccded')throw new Error('Excel-skabelonen er beskadiget (kontrolsum passer ikke) – kontakt Christian');
+    if(digest!=='66c52e65776159cccf1dc2e7141e8fa0756c3d40ad98eb16b3fa2ca0abeccded')throw new Error('The Excel template is corrupted (checksum mismatch) – contact Christian');
     const R=JSON.parse(json);
     templateCache=await buildTemplate(JSZip,R);return templateCache;
   }
@@ -491,7 +491,7 @@ function fillTemplate(JSZip, templateBytes, name, monthYM, entries){
   const [Y,M]=monthYM.split('-').map(Number);const monthSerial=serial(Y,M,1);
   const pages=[{file:'xl/worksheets/sheet1.xml',first:11,last:41},{file:'xl/worksheets/sheet2.xml',first:5,last:41},{file:'xl/worksheets/sheet3.xml',first:5,last:41}];
   const cap=pages.reduce((a,p)=>a+(p.last-p.first+1),0);
-  if(entries.length>cap)throw new Error('Skabelonen har kun plads til '+cap+' vagter');
+  if(entries.length>cap)throw new Error('The template only has room for '+cap+' shifts');
   let totN=0,totX=0,idx=0;
   return JSZip.loadAsync(templateBytes).then(async zip=>{
     for(const p of pages){
@@ -519,16 +519,16 @@ function fillTemplate(JSZip, templateBytes, name, monthYM, entries){
 }
 
   async function exportXlsx(name,month,entries,btn){
-    if(!name.trim()){toast('Skriv dit navn først');$('name').focus();return;}
-    if(!entries.length){toast('Tilføj mindst én vagt først');return;}
-    if(typeof JSZip==='undefined'){toast('Zip-biblioteket kunne ikke indlæses – prøv at genindlæse siden');return;}
-    const label=btn.textContent;btn.disabled=true;btn.textContent='Laver fil…';
+    if(!name.trim()){toast('Enter your name first');$('name').focus();return;}
+    if(!entries.length){toast('Add at least one shift first');return;}
+    if(typeof JSZip==='undefined'){toast('The zip library could not be loaded – try reloading the page');return;}
+    const label=btn.textContent;btn.disabled=true;btn.textContent='Creating file…';
     try{
       const buf=await fillTemplate(JSZip,await templateBytes(),name.trim(),month,sortEntries(entries));
       const xlsxBlob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
       const filename='Duty_Roaster-KM_Ejendomsservice_'+monthLabel(month).replace(' ','-')+'-'+name.trim().replace(/\s+/g,'_')+'.xlsx';
-      await saveFile(filename,xlsxBlob,'Excel-fil hentet');
-    }catch(err){toast('Fejl ved eksport: '+(err&&err.message||err));}
+      await saveFile(filename,xlsxBlob,'Excel file downloaded');
+    }catch(err){toast('Export failed: '+(err&&err.message||err));}
     finally{btn.disabled=false;btn.textContent=label;}
   }
   $('exportBtn').addEventListener('click',()=>exportXlsx(state.name,state.month,state.entries,$('exportBtn')));
