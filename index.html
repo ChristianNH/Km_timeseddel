@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Timesheet – K.M Ejendomsservice</title>
 <meta name="theme-color" content="#d7231f">
+<link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Timesheet">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%23d7231f%27/%3E%3Ctext x=%2732%27 y=%2744%27 font-size=%2734%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27Arial%27 font-weight=%27bold%27%3EKM%3C/text%3E%3C/svg%3E">
@@ -49,6 +50,8 @@ header h1 small{display:block;font-size:13px;font-weight:500;color:var(--muted);
 .status .dot{width:9px;height:9px;border-radius:50%;background:var(--muted);flex:none}
 .status.ok .dot{background:var(--ok)} .status.warn .dot{background:var(--warn)} .status.bad .dot{background:var(--red)}
 
+.hint{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--soft);border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:14px}
+.chipbtn{font:inherit;font-size:13px;font-weight:600;background:var(--red);color:var(--red-ink);border:0;border-radius:999px;padding:7px 12px;cursor:pointer;flex:none}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
 .setup{padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:5px}
@@ -119,9 +122,10 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
   <div class="rule"></div>
   <div class="status" id="status"><span class="dot"></span><span id="statusText">Saving on this phone…</span></div>
 
+  <div class="hint" id="monthHint" hidden><span id="monthHintText"></span><button type="button" class="chipbtn" id="monthHintBtn"></button></div>
   <section class="card setup">
     <label>Name<input id="name" autocomplete="name" placeholder="First Last"></label>
-    <label>Month<input id="month" type="month"></label>
+    <label>Month shown<input id="month" type="month"></label>
   </section>
 
   <section class="card totals">
@@ -135,7 +139,7 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
 
 <div class="bar"><div>
   <button class="btn primary" id="addBtn">+ New shift</button>
-  <button class="btn" id="exportBtn">Download Excel</button>
+  <button class="btn" id="exportBtn">Send Excel</button>
 </div></div>
 
 <!-- shift form -->
@@ -154,6 +158,7 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
       <label><span>Workplace</span><select id="fSiteSel"></select></label>
       <label class="full" id="fSiteOtherWrap" hidden><span>Workplace name</span><input id="fSite" placeholder="Type the workplace" autocomplete="off"></label>
       <label class="full"><span>Notes</span><input id="fNote" placeholder="Optional"></label>
+      <label class="full" id="fPeriodWrap" hidden><span>Filed under month</span><select id="fPeriod"></select></label>
     </div>
     <div class="calc"><span>Hours</span><b id="fHours">0.00</b></div>
     <div class="err" id="fErr"></div>
@@ -177,10 +182,9 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
     <button class="btn block" id="backupBtn">Download backup <small>.json file</small></button>
     <button class="btn block" id="restoreBtn">Restore from backup <small>merged in</small></button>
     <input type="file" id="restoreFile" accept=".json,application/json" hidden>
-    <h3>Pay period</h3>
-    <p>Once the timesheet has been sent, you can close the period. Shifts are not deleted – they move to the archive and can be downloaded as Excel again.</p>
-    <button class="btn block" id="closePeriodBtn">Close period and start fresh <small id="closeCount"></small></button>
-    <div id="archiveList"></div>
+    <h3>Months</h3>
+    <p>Shifts are filed under the month selected at the top when you add them. Use the month selector to look back at earlier months; each month downloads as its own Excel file.</p>
+    <div id="monthList"></div>
     <div class="actions"><button type="button" class="btn" id="moreClose">Close</button></div>
   </div>
 </div>
@@ -197,15 +201,26 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
   const now=()=>Date.now();
 
   // ---------- state ----------
-  // entries: {id,date,start,end,pause,type,site,note,u}  deleted: {id:ts}  archive: [{id,label,name,month,entries,closedAt}]
+  // entries: {id,period:'YYYY-MM',date,start,end,pause,type,site,note,u}  deleted: {id:ts}
+  // (older versions used state.month + state.archive; normalize() migrates those)
+  const VIEWKEY='timeseddel:viewMonth';
+  const thisMonth=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1);};
   let state={name:'',month:'',entries:[],deleted:{},archive:[],u:0};
+  let viewMonth=null;try{viewMonth=localStorage.getItem(VIEWKEY);}catch(e){}
+  function normalize(){
+    const fallback=state.month||thisMonth();
+    for(const e of state.entries){if(!e.period)e.period=fallback;}
+    for(const a of (state.archive||[])){for(const e of (a.entries||[])){if(!e.period)e.period=a.month||fallback;if(!state.entries.some(x=>x.id===e.id)&&!state.deleted[e.id])state.entries.push(e);}}
+    state.archive=[];
+    if(!viewMonth)viewMonth=state.month||thisMonth();
+  }
   function load(){
     let s=null;
     try{s=JSON.parse(localStorage.getItem(KEY));}catch(e){}
     if(!s){try{s=JSON.parse(localStorage.getItem(SHADOW));}catch(e){}}
     if(!s){try{const l=JSON.parse(localStorage.getItem(LEGACY));if(l){s=l;s.entries=(l.entries||[]).map(e=>Object.assign({u:1},e));}}catch(e){}}
     if(s)state=Object.assign(state,s,{entries:s.entries||[],deleted:s.deleted||{},archive:s.archive||[]});
-    if(!state.month){const d=new Date();state.month=d.getFullYear()+'-'+pad(d.getMonth()+1);}
+    normalize();
   }
   load();
   function persistLocal(){
@@ -234,7 +249,8 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
     const arch=new Map(state.archive.map(a=>[a.id,a]));
     for(const a of (o.archive||[])){if(!arch.has(a.id)){arch.set(a.id,a);changed=true;}}
     state.archive=[...arch.values()].sort((a,b)=>b.closedAt-a.closedAt);
-    if((o.u||0)>(state.u||0)){if(o.name&&o.name!==state.name){state.name=o.name;changed=true;}if(o.month&&o.month!==state.month){state.month=o.month;changed=true;}state.u=o.u;}
+    if((o.u||0)>(state.u||0)){if(o.name&&o.name!==state.name){state.name=o.name;changed=true;}state.u=o.u;}
+    normalize();
     return changed;
   }
 
@@ -268,7 +284,7 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
     else if(cloudState==='saving'){el.classList.add('ok');t.textContent='Saving to cloud…';}
     else if(cloudState==='connecting'){t.textContent='Loading from cloud…';}
     else{el.classList.add('bad');t.textContent='Saved on phone · cloud failed: '+cloudError+(lastSync?' (last synced'+time+')':'');}
-    $('moreStatus').textContent=t.textContent+'. '+state.entries.length+' shifts in the open period, '+state.archive.length+' archived periods.';
+    $('moreStatus').textContent=t.textContent+'. '+state.entries.length+' shifts in '+monthLabel(viewMonth)+', '+state.entries.length+' in total.';
   }
   async function initCloud(){
     try{
@@ -300,18 +316,19 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
   function hoursOf(e){const a=toMin(e.start),b=toMin(e.end);if(a==null||b==null)return 0;let d=b-a;if(d<0)d+=1440;d-=Number(e.pause||0);return Math.max(0,d)/60;}
   function monthLabel(ym){const [y,m]=ym.split('-');return months[Number(m)-1]+' '+y;}
   function sortEntries(es){return [...es].sort((a,b)=>(a.date+a.start).localeCompare(b.date+b.start));}
-  const sorted=()=>sortEntries(state.entries);
+  const current=()=>state.entries.filter(e=>e.period===viewMonth);
+  const sorted=()=>sortEntries(current());
   function totalsOf(es){let n=0,x=0;for(const e of es){const h=hoursOf(e);if(e.type==='Ekstra')x+=h;else n+=h;}return {n,x,s:n+x};}
 
   // ---------- render ----------
   function render(){
-    $('name').value=state.name;$('month').value=state.month;
-    const t=totalsOf(state.entries);$('tNormal').textContent=fmt(t.n);$('tExtra').textContent=fmt(t.x);$('tSum').textContent=fmt(t.s);
+    $('name').value=state.name;$('month').value=viewMonth;
+    const t=totalsOf(current());$('tNormal').textContent=fmt(t.n);$('tExtra').textContent=fmt(t.x);$('tSum').textContent=fmt(t.s);
     const list=$('list');list.innerHTML='';
     const es=sorted();
-    if(!es.length){list.innerHTML='<div class="card empty">No shifts in this period yet. Tap "New shift" to get started.</div>';}
+    if(!es.length){list.innerHTML='<div class="card empty">No shifts in '+monthLabel(viewMonth)+' yet.'+(state.entries.length?' Change the month above to see other months.':' Tap "New shift" to get started.')+'</div>';}
     else{
-      const h=document.createElement('h2');h.textContent=es.length+(es.length===1?' shift':' shifts')+' · '+monthLabel(state.month);list.appendChild(h);
+      const h=document.createElement('h2');h.textContent=es.length+(es.length===1?' shift':' shifts')+' · '+monthLabel(viewMonth);list.appendChild(h);
       let cur=null,card=null,dayTotal=0,dayB=null;
       for(const e of es){
         if(e.date!==cur){
@@ -332,27 +349,32 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
         card.appendChild(btn);
       }
     }
-    renderArchive();setStatus();
+    renderMonths();setStatus();
+    const tm=thisMonth();const hint=$('monthHint');
+    if(viewMonth!==tm){hint.hidden=false;$('monthHintText').textContent='Showing '+monthLabel(viewMonth)+' – new shifts will be filed there.';$('monthHintBtn').textContent='Go to '+monthLabel(tm);}
+    else hint.hidden=true;
   }
-  function renderArchive(){
-    const box=$('archiveList');box.innerHTML='';
-    $('closeCount').textContent=state.entries.length+' shifts';
-    if(!state.archive.length){box.innerHTML='<p>No archived periods yet.</p>';return;}
-    const h=document.createElement('h3');h.textContent='Archive';box.appendChild(h);
-    for(const a of state.archive){
-      const row=document.createElement('div');row.className='arch';
-      const t=totalsOf(a.entries);
+  $('monthHintBtn').addEventListener('click',()=>setViewMonth(thisMonth()));
+  function renderMonths(){
+    const box=$('monthList');box.innerHTML='';
+    const byM={};for(const e of state.entries){(byM[e.period]=byM[e.period]||[]).push(e);}
+    const keys=Object.keys(byM).sort().reverse();
+    if(!keys.length){box.innerHTML='<p>No shifts yet.</p>';return;}
+    for(const m of keys){
+      const es=byM[m];const row=document.createElement('div');row.className='arch';
+      const t=totalsOf(es);
       row.innerHTML='<div><b></b><br><span style="color:var(--muted)"></span></div>';
-      row.querySelector('b').textContent=a.label;
-      row.querySelector('span').textContent=a.entries.length+' shifts · '+fmt(t.s)+' h · closed '+new Date(a.closedAt).toLocaleDateString('en-GB');
-      const b=document.createElement('button');b.className='btn ghost';b.textContent='Download Excel';b.style.minHeight='40px';b.style.padding='8px 12px';
-      b.addEventListener('click',()=>exportXlsx(a.name,a.month,a.entries,b));
+      row.querySelector('b').textContent=monthLabel(m)+(m===viewMonth?' (shown)':'');
+      row.querySelector('span').textContent=es.length+' shifts · '+fmt(t.n)+' h'+(t.x?' + '+fmt(t.x)+' extra':'');
+      const b=document.createElement('button');b.type='button';b.className='btn ghost';b.textContent='Show';b.style.minHeight='40px';b.style.padding='8px 12px';
+      b.addEventListener('click',()=>{setViewMonth(m);moreSheet.classList.remove('open');});
       row.appendChild(b);box.appendChild(row);
     }
   }
 
   $('name').addEventListener('input',e=>{state.name=e.target.value;persist();});
-  $('month').addEventListener('change',e=>{if(e.target.value){state.month=e.target.value;persist();render();}});
+  function setViewMonth(m){viewMonth=m;try{localStorage.setItem(VIEWKEY,m);}catch(e){}render();}
+  $('month').addEventListener('change',e=>{if(e.target.value)setViewMonth(e.target.value);});
 
   // ---------- shift form ----------
   let editing=null;const sheet=$('sheet');
@@ -374,6 +396,13 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
   function siteValue(){const v=$('fSiteSel').value;return v===OTHER?$('fSite').value.trim():v;}
   // tap anywhere in a time/date field to open the native picker
   ['fDate','fStart','fEnd'].forEach(id=>{const el=$(id);el.addEventListener('click',()=>{try{el.showPicker&&el.showPicker();}catch(e){}});});
+  function overlaps(e,skipId){
+    const a1=toMin(e.start),b1=toMin(e.end)+(toMin(e.end)<=a1?1440:0);
+    for(const o of state.entries){if(o.id===skipId||o.date!==e.date)continue;
+      const a2=toMin(o.start),b2=toMin(o.end)+(toMin(o.end)<=a2?1440:0);
+      if(a1<b2&&a2<b1)return o;}
+    return null;
+  }
   function formEntry(){return {date:$('fDate').value,start:$('fStart').value,end:$('fEnd').value,pause:Number($('fPause').value),type:$('fType').value,site:siteValue(),note:$('fNote').value.trim()};}
   function updCalc(){$('fHours').textContent=fmt(hoursOf(formEntry()));}
   ['fStart','fEnd','fPause'].forEach(id=>$(id).addEventListener('input',updCalc));
@@ -382,12 +411,17 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
     $('formTitle').textContent=e?'Edit shift':'New shift';$('deleteBtn').hidden=!e;$('fErr').textContent='';
     const last=sorted().pop();
     const today=new Date();const todayIso=today.getFullYear()+'-'+pad(today.getMonth()+1)+'-'+pad(today.getDate());
+    $('formTitle').textContent+=' · '+monthLabel(viewMonth);
     $('fDate').value=e?e.date:(last&&last.date>todayIso?last.date:todayIso);
     $('fStart').value=e?e.start:(last&&last.date===todayIso?last.end:'06:00');
     $('fEnd').value=e?e.end:'';
     $('fPause').value=e?String(e.pause):'0';
     $('fType').value=e?e.type:'Normal';
     fillSiteSelect(e?e.site:'');$('fNote').value=e?e.note:'';
+    $('fPeriodWrap').hidden=!e;
+    if(e){const sel=$('fPeriod');sel.innerHTML='';const ms=new Set(state.entries.map(x=>x.period));ms.add(e.period);ms.add(thisMonth());
+      const [y,m]=e.period.split('-').map(Number);ms.add((m===1?y-1:y)+'-'+pad(m===1?12:m-1));ms.add((m===12?y+1:y)+'-'+pad(m===12?1:m+1));
+      [...ms].sort().reverse().forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=monthLabel(k);sel.appendChild(o);});sel.value=e.period;}
     updCalc();sheet.classList.add('open');
   }
   function closeForm(){sheet.classList.remove('open');editing=null;}
@@ -398,11 +432,14 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
     ev.preventDefault();const e=formEntry();
     if(!e.date||!e.start||!e.end||!e.site){$('fErr').textContent='Fill in date, start, end and workplace.';$('fErr').scrollIntoView({block:'nearest'});return;}
     if(hoursOf(e)<=0){$('fErr').textContent='End time must be after start time (minus break).';return;}
-    e.u=now();
-    const wasEdit=!!editing;
+    e.u=now();e.period=editing?($('fPeriod').value||viewMonth):viewMonth;
+    const orig=editing?state.entries.find(x=>x.id===editing):null;
+    const ov=(orig&&orig.date===e.date&&orig.start===e.start&&orig.end===e.end)?null:overlaps(e,editing);
+    if(ov&&!confirm('This overlaps with '+ov.start+'–'+ov.end+' at '+ov.site+' on the same day. Save anyway?'))return;
+    const wasEdit=!!editing;const moved=wasEdit&&e.period!==viewMonth;
     if(editing){Object.assign(state.entries.find(x=>x.id===editing),e);}
     else{e.id=now().toString(36)+Math.random().toString(36).slice(2,6);state.entries.push(e);}
-    persist();render();closeForm();toast(wasEdit?'Shift updated':'Shift saved');
+    persist();render();closeForm();toast(moved?'Shift moved to '+monthLabel(e.period):(wasEdit?'Shift updated':'Shift saved'));
   });
   $('deleteBtn').addEventListener('click',()=>{
     if(!editing)return;if(!confirm('Delete this shift?'))return;
@@ -413,11 +450,14 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
 
   // ---------- more sheet: backup / restore / archive ----------
   const moreSheet=$('moreSheet');
-  $('moreBtn').addEventListener('click',()=>{renderArchive();setStatus();moreSheet.classList.add('open');});
+  $('moreBtn').addEventListener('click',()=>{renderMonths();setStatus();moreSheet.classList.add('open');});
   $('moreClose').addEventListener('click',()=>moreSheet.classList.remove('open'));
   moreSheet.addEventListener('click',e=>{if(e.target===moreSheet)moreSheet.classList.remove('open');});
   async function saveFile(filename,data,okMsg){
     const blob=data instanceof Blob?data:new Blob([data],{type:'application/json'});
+    try{const file=new File([blob],filename,{type:blob.type});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:filename});toast('Shared');return;}
+    }catch(err){if(err&&err.name==='AbortError'){toast('Cancelled');return;}}
     const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();
     setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},4000);toast(okMsg);
   }
@@ -432,15 +472,6 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
     try{const o=JSON.parse(await f.text());const s=o.state||o;if(!Array.isArray(s.entries))throw new Error('not a valid backup file');
       const before=state.entries.length;mergeInto(s);persist();render();toast('Restored: '+state.entries.length+' shifts ('+(state.entries.length-before>=0?'+':'')+(state.entries.length-before)+')');}
     catch(e){toast('Could not read the file: '+e.message);}
-  });
-  $('closePeriodBtn').addEventListener('click',()=>{
-    if(!state.entries.length){toast('There are no shifts to archive');return;}
-    const label=monthLabel(state.month);
-    if(!confirm('Close the period "'+label+'" with '+state.entries.length+' shifts? They move to the archive and you start with an empty list.'))return;
-    state.archive.unshift({id:now().toString(36),label:label+' · '+(state.name||'no name'),name:state.name,month:state.month,entries:sorted(),closedAt:now()});
-    state.entries=[];state.deleted={};
-    const [y,m]=state.month.split('-').map(Number);const nm=m===12?[y+1,1]:[y,m+1];state.month=nm[0]+'-'+pad(nm[1]);
-    persist();render();moreSheet.classList.remove('open');toast('Period archived – new period: '+monthLabel(state.month));
   });
 
   // ---------- Excel export: fills the original KM template (embedded) ----------
@@ -533,19 +564,20 @@ function fillTemplate(JSZip, templateBytes, name, monthYM, entries){
 
   async function exportXlsx(name,month,entries,btn){
     if(!name.trim()){toast('Enter your name first');$('name').focus();return;}
-    if(!entries.length){toast('Add at least one shift first');return;}
+    if(!entries.length){toast('No shifts in '+monthLabel(month)+' to export');return;}
     if(typeof JSZip==='undefined'){toast('The zip library could not be loaded – try reloading the page');return;}
     const label=btn.textContent;btn.disabled=true;btn.textContent='Creating file…';
     try{
       const buf=await fillTemplate(JSZip,await templateBytes(),name.trim(),month,sortEntries(entries));
       const xlsxBlob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
       const filename='Duty_Roaster-KM_Ejendomsservice_'+monthLabel(month).replace(' ','-')+'-'+name.trim().replace(/\s+/g,'_')+'.xlsx';
-      await saveFile(filename,xlsxBlob,'Excel file downloaded');
+      await saveFile(filename,xlsxBlob,'Excel file ready');
     }catch(err){toast('Export failed: '+(err&&err.message||err));}
     finally{btn.disabled=false;btn.textContent=label;}
   }
-  $('exportBtn').addEventListener('click',()=>exportXlsx(state.name,state.month,state.entries,$('exportBtn')));
+  $('exportBtn').addEventListener('click',()=>exportXlsx(state.name,viewMonth,current(),$('exportBtn')));
 
+  if('serviceWorker' in navigator&&location.protocol.startsWith('http')){navigator.serviceWorker.register('sw.js').catch(()=>{});}
   render();setStatus();initCloud();
   setTimeout(()=>{if(typeof JSZip!=='undefined')templateBytes().then(()=>console.log('template ok')).catch(e=>toast(e.message));},1500);
 })();

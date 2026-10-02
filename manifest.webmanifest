@@ -1,0 +1,12 @@
+{
+  "name": "Timesheet – K.M Ejendomsservice",
+  "short_name": "Timesheet",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f5f2",
+  "theme_color": "#d7231f",
+  "icons": [
+    { "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%23d7231f'/%3E%3Ctext x='256' y='352' font-size='272' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'%3EKM%3C/text%3E%3C/svg%3E", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
